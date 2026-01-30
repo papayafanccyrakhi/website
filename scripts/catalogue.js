@@ -13,6 +13,9 @@ fetch("/data/catalogue.md")
 				if (!v.length) return;
 				obj[k.trim()] = v.join(":").trim();
 			});
+			obj.price = Number(obj.price);
+			obj.old = Number(obj.old);
+			obj.discount = Math.round(((obj.old - obj.price) / obj.old) * 100);
 			return obj;
 		});
 
@@ -23,17 +26,16 @@ fetch("/data/catalogue.md")
 			container.innerHTML += `
 			<div class="col-lg-3 col-md-6">
 				<div class="card product-card h-100">
-					<img src="${p.image}" class="card-img-top">
-					<div class="card-body">
-						<div>
-							<div class="product-title">${p.title}</div>
-							<div class="price">
-								Rs ${p.price}
-								<span class="old-price">Rs ${p.old}</span>
-							</div>
+					<img src="/${p.image}" class="card-img-top">
+					<div class="card-body text-center">
+						<div class="product-title">${p.title}</div>
+						<div class="price">
+							Rs ${p.price}
+							<span class="old-price">Rs ${p.old}</span>
 						</div>
+						<div class="discount">${p.discount}% OFF</div>
 						<a href="javascript:void(0)"
-						   class="btn btn-whatsapp mt-2"
+						   class="btn btn-whatsapp w-100 mt-2"
 						   onclick="contactWhatsApp(this)">
 							<i class="fa-brands fa-whatsapp"></i> WhatsApp
 						</a>

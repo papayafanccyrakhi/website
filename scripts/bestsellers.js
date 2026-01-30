@@ -26,7 +26,7 @@ fetch("/data/bestsellers.md")
 			container.innerHTML += `
 			<div class="col-lg-3 col-md-6">
 				<div class="card product-card h-100">
-					<img src="${p.image}" class="card-img-top">
+					<img src="/${p.image}" class="card-img-top">
 					<div class="card-body text-center">
 						<div class="product-title">${p.title}</div>
 						<div class="price">
