@@ -19,35 +19,118 @@ fetch("/data/bestsellers.md")
 		const container = document.getElementById("bestSellers");
 		container.innerHTML = "";
 
-		products.forEach((p, idx) => {
+		products.forEach((p) => {
 			const div = document.createElement("div");
 			div.classList.add("product-card");
-
 			div.innerHTML = `
-        <div class="card shell-card gold-outlier" onclick='openProduct(${JSON.stringify(p)})'>
-          <div class="image-wrap">
-            <img src="/${p.image}" alt="${p.title}">
-          </div>
-          <div class="card-body text-center">
-            <h5 class="product-title">${p.title}</h5>
-          </div>
-        </div>
-      `;
+            <div class="card shell-card gold-outlier" onclick='openProduct(${JSON.stringify(
+							p,
+						)})'>
+                <div class="image-wrap">
+                    <img src="/${p.image}" alt="${p.title}">
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="product-title">${p.title}</h5>
+                </div>
+            </div>`;
 			container.appendChild(div);
 		});
 
-		// Duplicate cards for seamless infinite scroll
+		// Duplicate for seamless scroll
 		container.innerHTML += container.innerHTML;
 
-		// Infinite horizontal scroll
-		let scrollPos = 0;
-		function animate() {
-			scrollPos += 0.5; // adjust speed
-			if (scrollPos >= container.scrollWidth / 2) scrollPos = 0;
-			container.style.transform = `translateX(-${scrollPos}px)`;
-			requestAnimationFrame(animate);
+		// Auto scroll
+		let speed = 0.5;
+		let isUserInteracting = false;
+
+		function autoScroll() {
+			if (!isUserInteracting) {
+				container.scrollLeft += speed;
+				if (container.scrollLeft >= container.scrollWidth / 2) {
+					container.scrollLeft = 0;
+				}
+			}
+			requestAnimationFrame(autoScroll);
 		}
-		animate();
+		autoScroll();
+
+		// Drag to scroll
+		let isDown = false;
+		let startX;
+		let scrollLeft;
+
+		container.addEventListener(
+			"mousedown",
+			(e) => {
+				isDown = true;
+				isUserInteracting = true;
+				container.classList.add("active");
+				startX = e.pageX - container.offsetLeft;
+				scrollLeft = container.scrollLeft;
+			},
+			{ passive: true },
+		);
+		container.addEventListener(
+			"mouseleave",
+			() => {
+				isDown = false;
+				isUserInteracting = false;
+				container.classList.remove("active");
+			},
+			{ passive: true },
+		);
+		container.addEventListener(
+			"mouseup",
+			() => {
+				isDown = false;
+				isUserInteracting = false;
+				container.classList.remove("active");
+			},
+			{ passive: true },
+		);
+		container.addEventListener(
+			"mousemove",
+			(e) => {
+				if (!isDown) return;
+				e.preventDefault();
+				const x = e.pageX - container.offsetLeft;
+				const walk = (x - startX) * 2; // scroll-fast
+				container.scrollLeft = scrollLeft - walk;
+			},
+			{ passive: false }, // must be false because we call preventDefault
+		);
+
+		// Touch events for mobile
+		let startTouchX = 0;
+		let scrollStart = 0;
+
+		container.addEventListener(
+			"touchstart",
+			(e) => {
+				isUserInteracting = true;
+				startTouchX = e.touches[0].pageX;
+				scrollStart = container.scrollLeft;
+			},
+			{ passive: true },
+		);
+
+		container.addEventListener(
+			"touchmove",
+			(e) => {
+				const x = e.touches[0].pageX;
+				const walk = (x - startTouchX) * 2;
+				container.scrollLeft = scrollStart - walk;
+			},
+			{ passive: true },
+		);
+
+		container.addEventListener(
+			"touchend",
+			() => {
+				isUserInteracting = false;
+			},
+			{ passive: true },
+		);
 	});
 
 function openProduct(p) {
