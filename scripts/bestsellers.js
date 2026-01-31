@@ -47,7 +47,8 @@ fetch("/data/bestsellers.md")
 			if (!isUserInteracting) {
 				container.scrollLeft += speed;
 				if (container.scrollLeft >= container.scrollWidth / 2) {
-					container.scrollLeft = 0;
+					container.scrollLeft =
+						(container.scrollLeft + speed) % (container.scrollWidth / 2);
 				}
 			}
 			requestAnimationFrame(autoScroll);

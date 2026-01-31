@@ -169,7 +169,7 @@
 	border-radius: 50%;
 	object-fit: cover;
 	margin-bottom: 15px;
-	border: 3px solid #8b0000;
+	border: 3px solid var(--deep-red);
 }
 
 .testimonial-stars {
@@ -187,5 +187,61 @@
 .testimonial-name {
 	margin-top: 12px;
 	font-weight: 600;
-	color: #8b0000;
+	color: var(--deep-red);
+}
+
+/* Lighter, cleaner FAQ Accordion */
+#faqAccordion .accordion-button {
+	background-color: var(--cream);
+	color: var(--deep-red);
+	font-weight: 600;
+	border: 1px solid var(--deep-red);
+	border-radius: 0.5rem;
+	padding: 0.75rem 1rem;
+	box-shadow: none;
+	transition:
+		background 0.2s,
+		transform 0.2s;
+}
+
+#faqAccordion .accordion-button:hover {
+	background-color: var(--beige);
+}
+
+#faqAccordion .accordion-button:not(.collapsed) {
+	background-color: var(--beige);
+	color: var(--deep-red);
+}
+
+#faqAccordion .accordion-button:focus {
+	box-shadow: none;
+	outline: none;
+}
+
+#faqAccordion .accordion-button::after {
+	color: var(--deep-red);
+	font-weight: bold;
+	transition: transform 0.2s;
+}
+
+#faqAccordion .accordion-button.collapsed::after {
+	transform: rotate(0deg);
+}
+
+#faqAccordion .accordion-button:not(.collapsed)::after {
+	transform: rotate(180deg);
+}
+
+#faqAccordion .accordion-body {
+	background-color: var(--cream);
+	color: var(--text-dark);
+	font-size: 0.95rem;
+	padding: 1rem 1.25rem;
+	border-top: 1px solid var(--beige);
+}
+
+/* Remove inner accordion item borders for cleaner look */
+#faqAccordion .accordion-item {
+	border: none;
+	margin-bottom: 0.5rem;
 }
