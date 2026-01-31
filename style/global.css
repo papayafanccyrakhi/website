@@ -177,7 +177,6 @@ footer {
 }
 
 .floating-shop:hover {
-	background: var(--dark-gold);
 	transform: scale(1.1);
 	color: #8b0000;
 }
