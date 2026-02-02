@@ -2,48 +2,57 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<title>Papaya Fancy Rakhi - Catalogue</title>
+		<title>Papaya Fancy Rakhi - Home</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta
 			name="description"
 			content="Papaya Fancy Rakhi offers premium handmade rakhis with pan-India delivery. Established in 2007 with 15+ years of craftsmanship." />
 
+		<!-- Favicon -->
 		<link rel="icon" href="/assets/favicon.ico" type="image/x-icon" />
-		<link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon" />
 
-		<!-- CSS -->
-		<link rel="preload" href="/style/home.css" as="style" />
-		<link rel="preload" href="/style/global.css" as="style" />
+		<!-- Bootstrap & Font Awesome -->
+		<link
+			rel="preload"
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+			as="style"
+			onload="
+				this.onload = null;
+				this.rel = 'stylesheet';
+			" />
+		<link
+			rel="preload"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+			as="style"
+			onload="
+				this.onload = null;
+				this.rel = 'stylesheet';
+			" />
+		<noscript>
+			<link
+				rel="stylesheet"
+				href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+		</noscript>
 
+		<!-- Homepage-specific CSS -->
+		<link rel="stylesheet" href="/style/catalogue.css" />
+		<link rel="stylesheet" href="/style/global.css" />
+
+		<!-- Critical hero image preload -->
 		<link
 			rel="preload"
 			as="image"
 			href="/assets/hero.webp"
 			fetchpriority="high" />
 
-		<link
-			rel="preload"
-			as="style"
-			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-			onload="this.rel = 'stylesheet'" />
-
-		<link
-			rel="preload"
-			as="style"
-			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-			onload="this.rel = 'stylesheet'" />
-
-		<link rel="stylesheet" href="/style/catalogue.css" />
-		<link rel="stylesheet" href="/style/global.css" />
-
-		<!-- supabase -->
+		<!-- Supabase -->
 		<script
 			defer
 			src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-		<!-- supabase url and public key -->
 		<script defer src="/data/supa_data.js"></script>
-	</head>
 	<body>
+
+		<main>
 		<!-- Navbar -->
 		<nav class="navbar navbar-expand-lg">
 			<div class="container">
@@ -61,8 +70,7 @@
 		</nav>
 
 		<div
-			class="hero text-center mb-5"
-			style="background-image: url(&quot;/assets/hero.webp&quot;)">
+			class="hero text-center mb-5">
 			<h1>Celebrate Raksha Bandhan with Premium Rakhis</h1>
 			<p class="text-gold">Handpicked designs, delivered across India</p>
 		</div>
@@ -124,6 +132,8 @@
 			© 2026 Papaya Fancy Rakhi. All rights reserved.
 		</footer>
 
+		</main>
+
 		<!-- Loader -->
 		<div id="loader" class="loader-overlay hidden">
 			<div class="spinner-border text-danger" role="status">
@@ -133,7 +143,7 @@
 
 		<!-- JS -->
 		<script defer src="/scripts/catalogue.js"></script>
-		<script src="/scripts/floatingmenu.js"></script>
+		<script defer ="/scripts/floatingmenu.js"></script>
 		<script
 			defer
 			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
