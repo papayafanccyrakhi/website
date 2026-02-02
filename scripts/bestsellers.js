@@ -9,7 +9,7 @@ function renderProductCard(product) {
 	div.innerHTML = `
 		<div class="card shell-card gold-outlier">
 			<div class="image-wrap">
-				<img src="${product.image}" alt="${product.title}">
+				<img src="${product.image}" alt="${product.title}" width="260" height="260">
 			</div>
 			<div class="card-body text-center">
 				<h5 class="product-title">${product.title}</h5>

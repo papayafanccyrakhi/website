@@ -52,6 +52,9 @@
 .best-sellers-row::-webkit-scrollbar {
 	display: none; /* Chrome, Edge, Safari */
 }
+#bestSellers {
+	min-height: 280px; /* at least the height of your cards */
+}
 
 /* ================== Product Card ================== */
 .product-card {

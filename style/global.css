@@ -13,6 +13,9 @@
 	--white: #ffffff;
 }
 
+html {
+	font-display: swap;
+}
 /* Base */
 body {
 	background: var(--cream);
