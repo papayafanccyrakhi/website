@@ -3,125 +3,158 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Product</title>
-		<style>
-			body {
-				font-family: Arial, sans-serif;
-				padding: 20px;
-				background: #f5e6c8;
-				color: #3b2b1a;
-			}
-			.product-container {
-				max-width: 600px;
-				margin: auto;
-				background: #fff8ee;
-				padding: 20px;
-				border-radius: 10px;
-				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-			}
-			.product-image {
-				width: 100%;
-				max-height: 300px;
-				object-fit: cover;
-				border-radius: 6px;
-			}
-			h2 {
-				margin-top: 0;
-			}
-			.price {
-				font-size: 18px;
-				font-weight: bold;
-				margin-top: 10px;
-			}
-			.old-price {
-				text-decoration: line-through;
-				color: #8b0000;
-				margin-left: 10px;
-			}
-			.discount-badge {
-				color: white;
-				background: #c62828;
-				padding: 3px 6px;
-				border-radius: 4px;
-				font-size: 12px;
-				margin-left: 5px;
-			}
-			.spinner {
-				text-align: center;
-				font-size: 16px;
-				color: #3b2b1a;
-			}
-		</style>
-		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-		<script src="/data/supa_data.js"></script>
+		<title>Product page</title>
+		<link rel="icon" href="/assets/favicon.ico" type="image/x-icon" />
+
+		<!-- Bootstrap & Font Awesome -->
+		<link
+			rel="preload"
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+			as="style"
+			onload="
+				this.onload = null;
+				this.rel = 'stylesheet';
+			" />
+		<link
+			rel="preload"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+			as="style"
+			onload="
+				this.onload = null;
+				this.rel = 'stylesheet';
+			" />
+		<noscript>
+			<link
+				rel="stylesheet"
+				href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+		</noscript>
+		<!-- Global Styles -->
+		<link rel="stylesheet" href="/style/global.css" />
+		<link rel="stylesheet" href="/style/products.css" />
+
+		<script
+			defer
+			src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+		<script defer src="/data/supa_data.js"></script>
 	</head>
 	<body>
-		<div class="product-container" id="productContainer">
-			<h2>Loading...</h2>
-		</div>
+		<main>
+			<!-- Navbar -->
+			<nav
+				class="navbar navbar-expand-lg navbar-dark"
+				style="background-color: var(--deep-red)">
+				<div class="container">
+					<a class="navbar-brand" href="/">
+						<img
+							src="/assets/logo.webp"
+							width="50"
+							height="50"
+							alt="Papaya Fancy Rakhi logo"
+							style="
+								border-radius: 50%;
+								object-fit: cover;
+								margin-right: 10px;
+							" />
+						Papaya Fancy Rakhi
+					</a>
+				</div>
+			</nav>
 
-		<script>
-			const container = document.getElementById("productContainer");
+			<!-- Product Layout -->
+			<div class="container my-4">
+				<div class="row g-4 align-items-start">
+					<!-- Left: Image + Gallery -->
+					<div class="col-12 col-md-6 d-flex flex-column h-100">
+						<div class="product-container h-100 d-flex flex-column">
+							<div
+								id="carouselMain"
+								class="carousel slide"
+								data-bs-ride="carousel">
+								<div class="carousel-inner" id="carouselInner"></div>
+							</div>
+							<div
+								class="d-flex flex-wrap mt-2 justify-content-center carousel-thumbs"
+								id="gallery"></div>
+						</div>
+					</div>
 
-			const hash = window.location.hash;
-			const productId = hash ? hash.split("=")[1] : null;
+					<!-- Right: Info -->
+					<div class="col-12 col-md-6 d-flex">
+						<div class="product-container d-flex flex-column gap-3 w-100 h-100">
+							<h1 id="productTitle"></h1>
+							<div class="description" id="productDescription"></div>
+							<span id="showMoreBtn" class="show-more" hidden>Show more</span>
 
-			if (!productId) {
-				container.innerHTML = "<h2>Product ID not specified</h2>";
-			} else {
-				// Try to get product from localStorage
-				const catalogue = JSON.parse(
-					localStorage.getItem("catalogueProducts") || "[]",
-				);
-				let product = catalogue.find((p) => p.id === productId);
+							<div class="mb-2">
+								<span class="fw-bold">Rs </span>
+								<span id="productPrice" class="fs-4 fw-bold"></span>
+								<span id="oldPrice" class="old-price"></span>
+								<span id="discountBadge" class="discount-badge"></span>
+							</div>
 
-				async function fetchProductFromSupabase(id) {
-					const supabaseClient = window.supabase.createClient(
-						SUPA_URL,
-						SUPA_PUBLIC_KEY,
-					);
-					const { data, error } = await supabaseClient
-						.from("products")
-						.select("*")
-						.eq("id", id)
-						.single();
-					if (error || !data) return null;
-					return data;
-				}
+							<div class="tags mb-2">
+								<strong>Tags:</strong> <span id="productTags"></span>
+							</div>
 
-				async function renderProduct() {
-					if (!product) {
-						container.innerHTML =
-							'<div class="spinner">Fetching product from server...</div>';
-						product = await fetchProductFromSupabase(productId);
-					}
+							<div class="notice">
+								* Price is finalized on WhatsApp after confirmation with seller.
+							</div>
 
-					if (!product) {
-						container.innerHTML = "<h2>Product not found</h2>";
-						return;
-					}
+							<!-- WhatsApp + Call buttons -->
+							<div class="d-flex gap-2 mt-2">
+								<button id="whatsappBtn" class="whatsapp-Btn">
+									<i class="fab fa-whatsapp me-2"></i> Contact on WhatsApp
+								</button>
+								<a href="tel:+917601938547" class="call-Btn">
+									<i class="fas fa-phone"></i> Contact on Phone
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-					const oldPriceHtml =
-						product.discount > 0
-							? `<span class="old-price">Rs ${Math.round(product.price / (1 - product.discount / 100))}</span>`
-							: "";
-					const discountHtml =
-						product.discount > 0
-							? `<span class="discount-badge">${product.discount}% OFF</span>`
-							: "";
-					const tagsHtml = product.tags ? product.tags.join(", ") : "";
+			<!-- Loader -->
+			<div id="loader" class="text-center py-5">Loading product...</div>
+			<!-- sticky -->
+			<div class="sticky-menu-wrapper">
+				<button
+					type="button"
+					class="floating-shop"
+					id="floatingMenu"
+					aria-label="Open floating menu">
+					<i class="fas fa-bars"></i>
+				</button>
 
-					container.innerHTML = `
-      <h2>${product.title}</h2>
-      <img src="${product.image}" class="product-image" alt="${product.title}">
-      <p>${product.description || ""}</p>
-      <div class="price">Rs ${product.price} ${oldPriceHtml} ${discountHtml}</div>
-      <div><strong>Tags:</strong> ${tagsHtml}</div>
-    `;
-				}
+				<div class="menu-actions" id="menuActions">
+					<a href="/catalogue/" class="menu-action" title="Browse Catalogue">
+						<i class="fas fa-shopping-cart"></i>
+					</a>
+					<a
+						href="https://wa.me/917601938547"
+						class="menu-action"
+						title="WhatsApp Us">
+						<i class="fab fa-whatsapp"></i>
+					</a>
+					<a href="tel:+917601938547" class="menu-action" title="Call Us">
+						<i class="fas fa-phone"></i>
+					</a>
+				</div>
+			</div>
+		</main>
 
-				renderProduct();
-			}
-		</script>
+		<footer class="mt-5 text-center">
+			© 2026 Papaya Fancy Rakhi. All rights reserved.
+		</footer>
+		<!-- Scripts -->
+		<script
+			defer
+			src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+		<script
+			defer
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+		<script defer src="/scripts/floatingmenu.js"></script>
+		<script defer src="/scripts/whatsapp.js"></script>
+		<script defer src="/scripts/products.js"></script>
 	</body>
 </html>

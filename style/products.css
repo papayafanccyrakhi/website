@@ -1,0 +1,102 @@
+/* Product-specific overrides */
+.product-container {
+	background: var(--cream);
+	padding: 20px;
+	border-radius: 12px;
+	box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+}
+.product-image {
+	width: 100%;
+	max-height: 450px;
+	object-fit: contain;
+	border-radius: 12px;
+	background: white;
+}
+.old-price {
+	font-size: 16px;
+	color: #8b0000;
+	text-decoration: line-through;
+	margin-left: 10px;
+}
+.discount-badge {
+	background: #c62828;
+	color: white;
+	font-size: 12px;
+	padding: 4px 8px;
+	border-radius: 6px;
+	margin-left: 10px;
+}
+.whatsapp-Btn {
+	margin-top: 20px;
+	width: 100%;
+	padding: 14px;
+	background: #25d366;
+	border: none;
+	border-radius: 10px;
+	color: white;
+	font-size: 18px;
+	font-weight: 700;
+}
+.whatsapp-Btn:hover {
+	background: #1ebc5a;
+}
+.notice {
+	font-size: 13px;
+	margin-top: 10px;
+	color: #5a3c1d;
+}
+.description {
+	position: relative;
+	overflow: hidden;
+	max-height: 100px;
+	transition: max-height 0.3s ease;
+}
+.description.expanded {
+	max-height: 1000px;
+}
+.show-more {
+	color: #c62828;
+	cursor: pointer;
+	font-weight: 600;
+	display: inline-block;
+	margin-top: 6px;
+}
+.carousel-thumbs img {
+	height: 60px;
+	width: auto;
+	object-fit: cover;
+	cursor: pointer;
+	margin: 5px;
+	border: 2px solid transparent;
+	border-radius: 6px;
+	transition: border 0.2s;
+}
+.carousel-thumbs img.active {
+	border-color: var(--gold);
+}
+
+.call-Btn {
+	margin-top: 20px;
+	width: 100%;
+	padding: 14px;
+	background: #3b2b1a; /* dark brown */
+	border: none;
+	border-radius: 10px;
+	color: var(--gold);
+	font-size: 18px;
+	font-weight: 700;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px; /* space between icon and text */
+	transition:
+		transform 0.2s ease,
+		background-color 0.2s ease;
+	text-decoration: none;
+}
+
+.call-Btn:hover {
+	background: var(--deep-red);
+	color: var(--white);
+	transform: scale(1.02);
+}

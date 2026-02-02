@@ -1,23 +1,18 @@
-function contactWhatsApp(button) {
-	// Find the nearest card container
-	const card = button.closest(".product-card");
-	if (!card) return;
+// whatsapp.js
 
-	// Get product name
-	const productTitle = card.querySelector(".product-title");
-	if (!productTitle) return;
+function setupWhatsapp(product) {
+	const whatsappBtn = document.getElementById("whatsappBtn");
+	if (!whatsappBtn || !product) return;
 
-	const productName = productTitle.innerText.trim();
+	const message = encodeURIComponent(
+		`Hi, I want to buy this Rakhi:\n` +
+			`Title: ${product.title}\n` +
+			`ID: ${product.id}\n\n` +
+			`Please confirm availability and details. Thank you!\n` +
+			`Image: ${product.image}`,
+	);
 
-	// WhatsApp number
-	const phoneNumber = "917601938547"; // replace with your number
-
-	// Message
-	const message = `Hello! I am interested in ${productName}.`;
-
-	// WhatsApp URL
-	const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-
-	// Open WhatsApp in new tab
-	window.open(url, "_blank");
+	whatsappBtn.onclick = () => {
+		window.open(`https://wa.me/917601938547?text=${message}`, "_blank");
+	};
 }

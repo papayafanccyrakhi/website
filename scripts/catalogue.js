@@ -1,177 +1,134 @@
-// Supabase client
 supabase = window.supabase.createClient(SUPA_URL, SUPA_PUBLIC_KEY);
 
-// Show/hide loader
 function showLoader() {
-	document.getElementById("loader").classList.remove("d-none");
+	document.getElementById("loader").classList.remove("hidden");
 }
 function hideLoader() {
-	document.getElementById("loader").classList.add("d-none");
+	document.getElementById("loader").classList.add("hidden");
 }
 
-// Load catalogue products with caching
 async function loadCatalogue() {
 	showLoader();
 
 	const localData = localStorage.getItem("catalogueProducts");
 	const localTimestamps = localStorage.getItem("catalogueTimestamps");
 
-	// Fetch only id and updated_at for catalogue products
+	let localProducts = JSON.parse(localData || "[]");
+	let localTimestampsParsed = JSON.parse(localTimestamps || "{}");
+
+	// 1. Get live product ids
 	const { data: productsMeta, error: metaError } = await supabase
 		.from("products")
 		.select("id, updated_at")
 		.eq("show_in_catalogue", true);
 
-	if (metaError) return hideLoader();
+	if (metaError) {
+		hideLoader();
+		return;
+	}
 
-	let shouldUpdate = false;
-	if (!localData || !localTimestamps) {
-		shouldUpdate = true;
-	} else {
-		const localTimestampsParsed = JSON.parse(localTimestamps);
-		for (let p of productsMeta) {
-			if (
-				!localTimestampsParsed[p.id] ||
-				localTimestampsParsed[p.id] !== p.updated_at
-			) {
-				shouldUpdate = true;
-				break;
-			}
+	// If database is empty, hard reset cache
+	if (!productsMeta || productsMeta.length === 0) {
+		localStorage.removeItem("catalogueProducts");
+		localStorage.removeItem("catalogueTimestamps");
+
+		const container = document.getElementById("catalogue");
+		container.innerHTML = `<div class="empty-state">No products are listed.</div>`;
+		hideLoader();
+		return;
+	}
+
+	const liveIds = new Set();
+	const changedIds = [];
+
+	for (const p of productsMeta) {
+		liveIds.add(p.id);
+
+		if (
+			!localTimestampsParsed[p.id] ||
+			localTimestampsParsed[p.id] !== p.updated_at
+		) {
+			changedIds.push(p.id);
 		}
 	}
 
-	let catalogueProducts;
-	if (shouldUpdate) {
+	// 2. Remove deleted products from cache
+	localProducts = localProducts.filter((p) => liveIds.has(p.id));
+
+	// 3. Fetch only changed products
+	let updatedProducts = [];
+	if (changedIds.length > 0) {
 		const { data, error } = await supabase
 			.from("products")
-			.select("id,title,image,tags,price,discount,updated_at,is_best_seller")
-			.eq("show_in_catalogue", true)
-			.order("created_at", { ascending: false });
+			.select(
+				"id,title,description,image,gallery,tags,price,discount,updated_at,is_best_seller",
+			)
+			.in("id", changedIds);
 
-		if (error) return hideLoader();
+		if (error) {
+			hideLoader();
+			return;
+		}
 
-		catalogueProducts = data.map((p) => {
+		updatedProducts = data.map((p) => {
 			const discount = p.discount || 0;
-			const old = discount > 0 ? Math.round(p.price / (1 - discount / 100)) : 0;
+			const old =
+				discount > 0 && discount < 100
+					? Math.round(p.price / (1 - discount / 100))
+					: 0;
+
 			return { ...p, old, discount };
 		});
-
-		localStorage.setItem(
-			"catalogueProducts",
-			JSON.stringify(catalogueProducts),
-		);
-		const timestamps = {};
-		catalogueProducts.forEach((p) => (timestamps[p.id] = p.updated_at));
-		localStorage.setItem("catalogueTimestamps", JSON.stringify(timestamps));
-	} else {
-		catalogueProducts = JSON.parse(localData);
 	}
 
-	const container = document.getElementById("catalogue");
-	const tagFilters = document.getElementById("categoryFilters");
-	const sortSelect = document.getElementById("sortCatalogue");
+	// 4. Merge
+	const productMap = new Map(localProducts.map((p) => [p.id, p]));
 
-	// --- Tags for filter buttons ---
-	const tags = [
-		...new Set(catalogueProducts.flatMap((p) => p.tags).filter(Boolean)),
-	];
-
-	// --- Create filter buttons ---
-	function createButtons() {
-		tagFilters.innerHTML = "";
-
-		const allBtn = document.createElement("button");
-		allBtn.className = "desktop-btn btn btn-outline-secondary btn-sm active";
-		allBtn.textContent = "All";
-		allBtn.onclick = () => filterProducts("All");
-		tagFilters.appendChild(allBtn);
-
-		tags.forEach((tag) => {
-			const btn = document.createElement("button");
-			btn.className = "desktop-btn btn btn-outline-secondary btn-sm";
-			btn.textContent = tag;
-			btn.onclick = () => filterProducts(tag);
-			tagFilters.appendChild(btn);
-		});
-	}
-
-	// --- Filter products by tag ---
-	function filterProducts(tag) {
-		const filtered =
-			tag === "All"
-				? catalogueProducts
-				: catalogueProducts.filter((p) => p.tags.includes(tag));
-
-		document.querySelectorAll(".desktop-btn").forEach((b) => {
-			b.classList.toggle("active", b.textContent === tag);
-		});
-
-		renderProducts(filtered);
-	}
-
-	// --- Sorting ---
-	sortSelect.addEventListener("change", (e) => {
-		const activeBtn = document.querySelector(".desktop-btn.active");
-		const activeTag = activeBtn ? activeBtn.textContent : "All";
-
-		let sorted = [...catalogueProducts];
-		if (e.target.value === "price-asc")
-			sorted.sort((a, b) => a.price - b.price);
-		else if (e.target.value === "price-desc")
-			sorted.sort((a, b) => b.price - a.price);
-		else if (e.target.value === "discount")
-			sorted.sort((a, b) => b.discount - a.discount);
-
-		const filtered =
-			activeTag === "All"
-				? sorted
-				: sorted.filter((p) => p.tags.includes(activeTag));
-
-		renderProducts(filtered);
+	updatedProducts.forEach((p) => {
+		productMap.set(p.id, p);
+		localTimestampsParsed[p.id] = p.updated_at;
 	});
 
-	// --- Render products ---
-	function renderProducts(list) {
-		container.innerHTML = "";
+	const catalogueProducts = Array.from(productMap.values());
 
-		list.forEach((p) => {
-			const wrapper = document.createElement("div");
-			wrapper.className = "col-6 col-md-4 col-lg-3 col-xl-2";
+	// 5. Save
+	localStorage.setItem("catalogueProducts", JSON.stringify(catalogueProducts));
+	localStorage.setItem(
+		"catalogueTimestamps",
+		JSON.stringify(localTimestampsParsed),
+	);
 
-			// Conditional price HTML
-			const priceHtml =
-				p.price === -1
-					? ""
-					: `<div class="price">Rs ${p.price} ${
-							p.old > 0 ? `<span class="old-price">Rs ${p.old}</span>` : ""
-						} ${p.discount > 0 ? `<span class="discount-badge">${p.discount}% OFF</span>` : ""}</div>`;
+	// 6. Render
+	const container = document.getElementById("catalogue");
+	container.innerHTML = "";
 
-			wrapper.innerHTML = `
-			<div class="card product-card gold-outlier h-100">
-				<div class="image-wrap">
-					<img src="${p.image}" alt="${p.title}">
-					${p.discount > 0 && p.price !== -1 ? `<span class="discount-badge">${p.discount}% OFF</span>` : ""}
-				</div>
-				<div class="card-body text-center">
-					<div class="product-title">${p.title}</div>
-					${priceHtml}
-				</div>
-			</div>
-		`;
-
-			wrapper.querySelector(".product-card").addEventListener("click", () => {
-				location.href = `/product#id=${encodeURIComponent(p.id)}`;
-			});
-
-			container.appendChild(wrapper);
-		});
-
+	if (catalogueProducts.length === 0) {
+		container.innerHTML = `<div class="empty-state">No products are listed.</div>`;
 		hideLoader();
+		return;
 	}
 
-	createButtons();
-	renderProducts(catalogueProducts);
+	catalogueProducts.forEach((p) => {
+		const div = document.createElement("div");
+		div.className = "col-6 col-md-4 col-lg-3 col-xl-2";
+
+		div.innerHTML = `
+        <div class="card product-card h-100">
+            <img src="${p.image}">
+            <div class="card-body text-center">
+                <div class="product-title">${p.title}</div>
+                <div class="price">Rs ${p.price}</div>
+            </div>
+        </div>`;
+
+		div.onclick = () => {
+			location.href = "/product#id=" + p.id;
+		};
+
+		container.appendChild(div);
+	});
+
+	hideLoader();
 }
 
-// Run
 loadCatalogue();
