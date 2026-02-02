@@ -18,8 +18,7 @@ function renderProductCard(product) {
 	`;
 
 	div.addEventListener("click", () => {
-		sessionStorage.setItem("selectedProductId", product.id);
-		location.href = "/product.html";
+		location.href = `/product#id=${encodeURIComponent(product.id)}`;
 	});
 
 	return div;

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Product</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				padding: 20px;
+				background: #f5e6c8;
+				color: #3b2b1a;
+			}
+			.product-container {
+				max-width: 600px;
+				margin: auto;
+				background: #fff8ee;
+				padding: 20px;
+				border-radius: 10px;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			}
+			.product-image {
+				width: 100%;
+				max-height: 300px;
+				object-fit: cover;
+				border-radius: 6px;
+			}
+			h2 {
+				margin-top: 0;
+			}
+			.price {
+				font-size: 18px;
+				font-weight: bold;
+				margin-top: 10px;
+			}
+			.old-price {
+				text-decoration: line-through;
+				color: #8b0000;
+				margin-left: 10px;
+			}
+			.discount-badge {
+				color: white;
+				background: #c62828;
+				padding: 3px 6px;
+				border-radius: 4px;
+				font-size: 12px;
+				margin-left: 5px;
+			}
+			.spinner {
+				text-align: center;
+				font-size: 16px;
+				color: #3b2b1a;
+			}
+		</style>
+		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+		<script src="/data/supa_data.js"></script>
+	</head>
+	<body>
+		<div class="product-container" id="productContainer">
+			<h2>Loading...</h2>
+		</div>
+
+		<script>
+			const container = document.getElementById("productContainer");
+
+			const hash = window.location.hash;
+			const productId = hash ? hash.split("=")[1] : null;
+
+			if (!productId) {
+				container.innerHTML = "<h2>Product ID not specified</h2>";
+			} else {
+				// Try to get product from localStorage
+				const catalogue = JSON.parse(
+					localStorage.getItem("catalogueProducts") || "[]",
+				);
+				let product = catalogue.find((p) => p.id === productId);
+
+				async function fetchProductFromSupabase(id) {
+					const supabaseClient = window.supabase.createClient(
+						SUPA_URL,
+						SUPA_PUBLIC_KEY,
+					);
+					const { data, error } = await supabaseClient
+						.from("products")
+						.select("*")
+						.eq("id", id)
+						.single();
+					if (error || !data) return null;
+					return data;
+				}
+
+				async function renderProduct() {
+					if (!product) {
+						container.innerHTML =
+							'<div class="spinner">Fetching product from server...</div>';
+						product = await fetchProductFromSupabase(productId);
+					}
+
+					if (!product) {
+						container.innerHTML = "<h2>Product not found</h2>";
+						return;
+					}
+
+					const oldPriceHtml =
+						product.discount > 0
+							? `<span class="old-price">Rs ${Math.round(product.price / (1 - product.discount / 100))}</span>`
+							: "";
+					const discountHtml =
+						product.discount > 0
+							? `<span class="discount-badge">${product.discount}% OFF</span>`
+							: "";
+					const tagsHtml = product.tags ? product.tags.join(", ") : "";
+
+					container.innerHTML = `
+      <h2>${product.title}</h2>
+      <img src="${product.image}" class="product-image" alt="${product.title}">
+      <p>${product.description || ""}</p>
+      <div class="price">Rs ${product.price} ${oldPriceHtml} ${discountHtml}</div>
+      <div><strong>Tags:</strong> ${tagsHtml}</div>
+    `;
+				}
+
+				renderProduct();
+			}
+		</script>
+	</body>
+</html>

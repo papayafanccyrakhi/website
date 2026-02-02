@@ -1,29 +1,31 @@
 // Supabase client
 supabase = window.supabase.createClient(SUPA_URL, SUPA_PUBLIC_KEY);
 
+// Show/hide loader
+function showLoader() {
+	document.getElementById("loader").classList.remove("d-none");
+}
+function hideLoader() {
+	document.getElementById("loader").classList.add("d-none");
+}
+
 // Load catalogue products with caching
 async function loadCatalogue() {
-	console.log("Starting catalogue load...");
+	showLoader();
 
 	const localData = localStorage.getItem("catalogueProducts");
 	const localTimestamps = localStorage.getItem("catalogueTimestamps");
 
 	// Fetch only id and updated_at for catalogue products
-	console.log("Fetching catalogue product metadata from Supabase...");
 	const { data: productsMeta, error: metaError } = await supabase
 		.from("products")
 		.select("id, updated_at")
 		.eq("show_in_catalogue", true);
 
-	if (metaError) {
-		console.error("Supabase fetch error:", metaError);
-		return;
-	}
-	console.log("Fetched metadata:", productsMeta);
+	if (metaError) return hideLoader();
 
 	let shouldUpdate = false;
 	if (!localData || !localTimestamps) {
-		console.log("No localStorage found. Will fetch full catalogue.");
 		shouldUpdate = true;
 	} else {
 		const localTimestampsParsed = JSON.parse(localTimestamps);
@@ -32,41 +34,28 @@ async function loadCatalogue() {
 				!localTimestampsParsed[p.id] ||
 				localTimestampsParsed[p.id] !== p.updated_at
 			) {
-				console.log(`Product ${p.id} updated. Will fetch full catalogue.`);
 				shouldUpdate = true;
 				break;
 			}
 		}
-		if (!shouldUpdate)
-			console.log("All catalogue products up to date. Using localStorage.");
 	}
 
 	let catalogueProducts;
 	if (shouldUpdate) {
-		console.log("Fetching full catalogue products from Supabase...");
 		const { data, error } = await supabase
 			.from("products")
 			.select("id,title,image,tags,price,discount,updated_at,is_best_seller")
 			.eq("show_in_catalogue", true)
 			.order("created_at", { ascending: false });
 
-		if (error) {
-			console.error("Supabase fetch error:", error);
-			return;
-		}
+		if (error) return hideLoader();
 
-		// Calculate old price dynamically
 		catalogueProducts = data.map((p) => {
 			const discount = p.discount || 0;
 			const old = discount > 0 ? Math.round(p.price / (1 - discount / 100)) : 0;
-			return {
-				...p,
-				old,
-				discount,
-			};
+			return { ...p, old, discount };
 		});
 
-		// Save data & timestamps to localStorage
 		localStorage.setItem(
 			"catalogueProducts",
 			JSON.stringify(catalogueProducts),
@@ -74,17 +63,12 @@ async function loadCatalogue() {
 		const timestamps = {};
 		catalogueProducts.forEach((p) => (timestamps[p.id] = p.updated_at));
 		localStorage.setItem("catalogueTimestamps", JSON.stringify(timestamps));
-		console.log("Cached catalogue products and timestamps.");
 	} else {
 		catalogueProducts = JSON.parse(localData);
-		console.log(
-			"Loaded catalogue products from localStorage:",
-			catalogueProducts,
-		);
 	}
 
 	const container = document.getElementById("catalogue");
-	const tagFilters = document.getElementById("categoryFilters"); // renamed for tags
+	const tagFilters = document.getElementById("categoryFilters");
 	const sortSelect = document.getElementById("sortCatalogue");
 
 	// --- Tags for filter buttons ---
@@ -168,16 +152,15 @@ async function loadCatalogue() {
 			`;
 
 			wrapper.querySelector(".product-card").addEventListener("click", () => {
-				sessionStorage.setItem("selectedProductId", p.id);
-				console.log("Catalogue product clicked:", p.id);
-				window.location.href = "/product.html";
+				location.href = `/product#id=${encodeURIComponent(p.id)}`;
 			});
 
 			container.appendChild(wrapper);
 		});
+
+		hideLoader();
 	}
 
-	// --- Initialize catalogue ---
 	createButtons();
 	renderProducts(catalogueProducts);
 }

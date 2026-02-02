@@ -6,7 +6,6 @@
 		<title>Admin Dashboard</title>
 
 		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-		<!-- supabase url and public key -->
 		<script src="/data/supa_data.js"></script>
 
 		<link rel="stylesheet" href="/style/admin.css" />
@@ -44,30 +43,93 @@
 				</table>
 			</div>
 
-			<!-- Add/Edit Product Form -->
-			<form id="productForm">
-				<h3 id="formTitle">Add New Product</h3>
-				<input type="hidden" id="productId" />
-				<label>Title</label>
-				<input type="text" id="prodTitle" required />
-				<label>Description</label>
-				<textarea id="prodDesc" rows="3" required></textarea>
-				<label>Tags (comma separated)</label>
-				<input type="text" id="prodTags" required />
-				<label>Main Image</label>
-				<input type="file" id="prodMainImg" accept="image/*" required />
-				<label>Extra Images (multiple)</label>
-				<input type="file" id="prodExtraImgs" accept="image/*" multiple />
-				<label>
-					<input type="checkbox" id="prodBestSeller" /> Best Seller
-				</label>
-				<label>
-					<input type="checkbox" id="prodShowCat" /> Show in Catalogue
-				</label>
-				<button type="submit">Save Product</button>
-				<button type="button" id="cancelEdit">Cancel</button>
-			</form>
+			<!-- Tabs -->
+			<div class="tabs">
+				<button class="tab-btn active" data-tab="single">
+					Add Single Product
+				</button>
+				<button class="tab-btn" data-tab="batch">Batch Add Products</button>
+			</div>
+
+			<!-- Tab Contents -->
+			<div id="single" class="tab-content active">
+				<form id="productForm">
+					<h3 id="formTitle">Add New Product</h3>
+					<input type="hidden" id="productId" />
+					<label>Title</label>
+					<input type="text" id="prodTitle" required />
+					<label>Description</label>
+					<textarea id="prodDesc" rows="3" required></textarea>
+					<label>Tags (comma separated)</label>
+					<input type="text" id="prodTags" required />
+					<label>Main Image</label>
+					<input type="file" id="prodMainImg" accept="image/*" />
+					<label>Extra Images (multiple)</label>
+					<input type="file" id="prodExtraImgs" accept="image/*" multiple />
+					<label>Price</label>
+					<input type="number" id="prodPrice" step="0.01" required />
+					<label>Discount (%)</label>
+					<input type="number" id="prodDiscount" step="0.01" />
+					<label>
+						<input type="checkbox" id="prodBestSeller" /> Best Seller
+					</label>
+					<label>
+						<input type="checkbox" id="prodShowCat" /> Show in Catalogue
+					</label>
+					<button type="submit">Save Product</button>
+					<button type="button" id="cancelEdit">Cancel</button>
+				</form>
+			</div>
+
+			<div id="batch" class="tab-content">
+				<form id="batchForm">
+					<h3>Batch Add Products</h3>
+					<label>Title</label>
+					<input type="text" id="batchTitle" required />
+					<label>Description</label>
+					<textarea id="batchDesc" rows="3" required></textarea>
+					<label>Tags (comma separated)</label>
+					<input type="text" id="batchTags" required />
+					<label>Main Image</label>
+					<input type="file" id="batchMainImg" accept="image/*" />
+					<label>Extra Images (multiple)</label>
+					<input type="file" id="batchExtraImgs" accept="image/*" multiple />
+					<label>Price</label>
+					<input type="number" id="batchPrice" step="0.01" required />
+					<label>Discount (%)</label>
+					<input type="number" id="batchDiscount" step="0.01" />
+					<label>
+						<input type="checkbox" id="batchBestSeller" /> Best Seller
+					</label>
+					<label>
+						<input type="checkbox" id="batchShowCat" /> Show in Catalogue
+					</label>
+					<button type="button" id="addToQueueBtn">Add to Queue</button>
+					<button type="button" id="uploadQueueBtn">Upload All</button>
+				</form>
+
+				<div class="table-wrapper">
+					<table id="queueTable">
+						<thead>
+							<tr>
+								<th>Title</th>
+								<th>Description</th>
+								<th>Tags</th>
+								<th>Price</th>
+								<th>Discount</th>
+								<th>Best Seller</th>
+								<th>Show in Catalogue</th>
+								<th>Main Image</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
 		</div>
+
+		<!-- Spinner -->
 		<div id="spinner" class="spinner hidden">
 			<div class="loader"></div>
 			<div class="spinner-text">Please wait...</div>
