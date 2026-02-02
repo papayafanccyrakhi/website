@@ -131,6 +131,7 @@ async function loadCatalogue() {
 	});
 
 	// --- Render products ---
+	// --- Render products ---
 	function renderProducts(list) {
 		container.innerHTML = "";
 
@@ -138,18 +139,26 @@ async function loadCatalogue() {
 			const wrapper = document.createElement("div");
 			wrapper.className = "col-6 col-md-4 col-lg-3 col-xl-2";
 
+			// Conditional price HTML
+			const priceHtml =
+				p.price === -1
+					? ""
+					: `<div class="price">Rs ${p.price} ${
+							p.old > 0 ? `<span class="old-price">Rs ${p.old}</span>` : ""
+						} ${p.discount > 0 ? `<span class="discount-badge">${p.discount}% OFF</span>` : ""}</div>`;
+
 			wrapper.innerHTML = `
-				<div class="card product-card gold-outlier h-100">
-					<div class="image-wrap">
-						<img src="${p.image}" alt="${p.title}">
-						${p.discount > 0 ? `<span class="discount-badge">${p.discount}% OFF</span>` : ""}
-					</div>
-					<div class="card-body text-center">
-						<div class="product-title">${p.title}</div>
-						<div class="price">Rs ${p.price} ${p.old > 0 ? `<span class="old-price">Rs ${p.old}</span>` : ""}</div>
-					</div>
+			<div class="card product-card gold-outlier h-100">
+				<div class="image-wrap">
+					<img src="${p.image}" alt="${p.title}">
+					${p.discount > 0 && p.price !== -1 ? `<span class="discount-badge">${p.discount}% OFF</span>` : ""}
 				</div>
-			`;
+				<div class="card-body text-center">
+					<div class="product-title">${p.title}</div>
+					${priceHtml}
+				</div>
+			</div>
+		`;
 
 			wrapper.querySelector(".product-card").addEventListener("click", () => {
 				location.href = `/product#id=${encodeURIComponent(p.id)}`;
