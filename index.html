@@ -20,19 +20,44 @@
 				this.onload = null;
 				this.rel = 'stylesheet';
 			" />
+
+		<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
 		<link
-			rel="preload"
-			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-			as="style"
-			onload="
-				this.onload = null;
-				this.rel = 'stylesheet';
-			" />
-		<!-- Global CSS (shared across all pages) -->
-		<link rel="stylesheet" href="/style/global.css" />
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+		<style>
+			@font-face {
+				font-family: "Font Awesome 6 Free";
+				font-style: normal;
+				font-weight: 400;
+				font-display: swap;
+				src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/webfonts/fa-regular-400.woff2")
+					format("woff2");
+			}
+
+			@font-face {
+				font-family: "Font Awesome 6 Free";
+				font-style: normal;
+				font-weight: 900;
+				font-display: swap;
+				src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/webfonts/fa-solid-900.woff2")
+					format("woff2");
+			}
+
+			@font-face {
+				font-family: "Font Awesome 6 Brands";
+				font-style: normal;
+				font-weight: 400;
+				font-display: swap;
+				src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/webfonts/fa-brands-400.woff2")
+					format("woff2");
+			}
+		</style>
 
 		<!-- Homepage-specific CSS -->
 		<link rel="stylesheet" href="/style/home.css" />
+		<link rel="stylesheet" href="/style/global.css" />
 
 		<!-- Critical hero image preload -->
 		<link
@@ -117,7 +142,7 @@
 			</div>
 
 			<!-- Our Location -->
-			<div class="container-fluid bg-light py-5">
+			<div class="container-fluid py-5">
 				<div class="container">
 					<h2 class="text-center mb-4">Our Store Location</h2>
 					<div class="row align-items-center">
@@ -129,16 +154,15 @@
 							</p>
 						</div>
 						<div class="col-md-6">
-							<iframe
-								title="Papaya Fancy Rakhi store location on Google Maps"
-								src="https://www.google.com/maps?q=Debnath+Enterprises,+Kalna,+West+Bengal,+India&z=19&output=embed"
-								width="100%"
-								height="300"
-								style="border: 0"
-								allowfullscreen=""
-								loading="lazy"
-								referrerpolicy="no-referrer-when-downgrade">
-							</iframe>
+							<div class="map-wrap gold-outlier">
+								<iframe
+									title="Papaya Fancy Rakhi store location on Google Maps"
+									src="https://www.google.com/maps?q=Debnath+Enterprises,+Kalna,+West+Bengal,+India&z=19&output=embed"
+									loading="lazy"
+									referrerpolicy="no-referrer-when-downgrade"
+									allowfullscreen>
+								</iframe>
+							</div>
 						</div>
 					</div>
 				</div>
