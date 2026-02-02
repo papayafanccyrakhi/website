@@ -12,6 +12,7 @@ const productForm = document.getElementById("productForm");
 const formTitle = document.getElementById("formTitle");
 const cancelEditBtn = document.getElementById("cancelEdit");
 const spinner = document.getElementById("spinner");
+const adminDisclaimer = document.getElementById("adminDisclaimer");
 
 // Inputs - single
 const productIdInput = document.getElementById("productId");
@@ -78,13 +79,16 @@ function hideSpinner() {
 async function checkSession() {
 	showSpinner();
 	const { data } = await supabase.auth.getSession();
+
 	if (data.session) {
 		loginForm.style.display = "none";
 		dashboard.style.display = "block";
+		if (adminDisclaimer) adminDisclaimer.style.display = "none";
 		await loadProducts();
 	} else {
 		loginForm.style.display = "block";
 		dashboard.style.display = "none";
+		if (adminDisclaimer) adminDisclaimer.style.display = "block";
 	}
 	hideSpinner();
 }

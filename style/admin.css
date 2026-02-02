@@ -20,6 +20,7 @@ body {
 
 h2,
 h3 {
+	text-align: center;
 	margin: 0 0 10px;
 }
 
@@ -97,7 +98,9 @@ h3 {
 	font-weight: bold;
 	transition: background 0.2s;
 	color: var(--text-dark);
-	border-radius: 6px 6px 0 0;
+	border-radius: 6px;
+	margin: 5px;
+	margin-bottom: 10px;
 }
 
 .tab-btn.active {
@@ -109,7 +112,7 @@ h3 {
 	display: none;
 	background: var(--cream);
 	padding: 20px;
-	border-radius: 0 0 10px 10px;
+	border-radius: 10px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
 }
 

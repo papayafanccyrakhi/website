@@ -131,7 +131,6 @@ async function loadCatalogue() {
 	});
 
 	// --- Render products ---
-	// --- Render products ---
 	function renderProducts(list) {
 		container.innerHTML = "";
 
