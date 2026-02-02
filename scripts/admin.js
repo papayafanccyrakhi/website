@@ -123,6 +123,17 @@ async function loadProducts() {
 		.order("created_at", { ascending: false });
 	if (error) return alert(error.message);
 	productsTableBody.innerHTML = "";
+
+	if (!data || data.length === 0) {
+		const tr = document.createElement("tr");
+		tr.innerHTML = `
+		<td colspan="7" style="padding:14px; color:#777;">
+			No products found
+		</td>
+	`;
+		productsTableBody.appendChild(tr);
+		return;
+	}
 	data.forEach((p) => {
 		const tr = document.createElement("tr");
 		tr.innerHTML = `
