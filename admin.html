@@ -66,6 +66,8 @@
 							<th>Title</th>
 							<th>Description</th>
 							<th>Tags</th>
+							<th>Price</th>
+							<th>Unit</th>
 							<th>Best Seller</th>
 							<th>Show in Catalogue</th>
 							<th>Main Image</th>
@@ -101,6 +103,9 @@
 					<input type="file" id="prodExtraImgs" accept="image/*" multiple />
 					<label>Price</label>
 					<input type="number" id="prodPrice" step="0.01" required />
+					<label>Unit (pc, dozen, etc)</label>
+					<input type="text" id="prodUnit" required />
+
 					<label>Discount (%)</label>
 					<input type="number" id="prodDiscount" step="0.01" />
 					<label>
@@ -129,6 +134,9 @@
 					<input type="file" id="batchExtraImgs" accept="image/*" multiple />
 					<label>Price</label>
 					<input type="number" id="batchPrice" step="0.01" required />
+					<label>Unit (pc, dozen, etc)</label>
+					<input type="text" id="batchUnit" required />
+
 					<label>Discount (%)</label>
 					<input type="number" id="batchDiscount" step="0.01" />
 					<label>
@@ -149,6 +157,7 @@
 								<th>Description</th>
 								<th>Tags</th>
 								<th>Price</th>
+								<th>Unit</th>
 								<th>Discount</th>
 								<th>Best Seller</th>
 								<th>Show in Catalogue</th>

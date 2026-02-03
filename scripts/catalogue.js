@@ -61,7 +61,7 @@ async function loadCatalogue() {
 		const { data, error } = await supabase
 			.from("products")
 			.select(
-				"id,title,description,image,gallery,tags,price,discount,updated_at,is_best_seller",
+				"id,title,description,image,gallery,tags,price,discount,updated_at,is_best_seller,unit",
 			)
 			.in("id", changedIds);
 
@@ -117,7 +117,7 @@ async function loadCatalogue() {
             <img src="${p.image}">
             <div class="card-body text-center">
                 <div class="product-title">${p.title}</div>
-                <div class="price">Rs ${p.price}</div>
+				<div class="price">Rs ${p.price} / ${p.unit || "pc"}</div>
             </div>
         </div>`;
 

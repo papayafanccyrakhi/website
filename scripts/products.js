@@ -53,7 +53,7 @@ function renderProduct(p) {
 		};
 	}
 
-	priceEl.textContent = p.price;
+	priceEl.textContent = `${p.price} / ${p.unit || "pc"}`;
 
 	const discount = Math.min(p.discount || 0, 100);
 	if (discount > 0)
