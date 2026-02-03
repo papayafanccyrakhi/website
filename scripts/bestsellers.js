@@ -8,7 +8,7 @@ async function loadBestSellers() {
 	let localProducts = JSON.parse(localData || "[]");
 	let localTimestampsParsed = JSON.parse(localTimestamps || "{}");
 
-	// 1. Get live product ids
+	// 1. Get live best seller ids + timestamps
 	const { data: productsMeta, error: metaError } = await supabase
 		.from("products")
 		.select("id, updated_at")
@@ -16,32 +16,39 @@ async function loadBestSellers() {
 
 	if (metaError) return console.error(metaError);
 
+	const container = document.getElementById("bestSellers");
+	container.innerHTML = "";
+
 	if (!productsMeta || productsMeta.length === 0) {
 		localStorage.removeItem("bestSellers");
 		localStorage.removeItem("bestSellersTimestamps");
-
-		document.getElementById("bestSellers").innerHTML =
-			'<div class="empty-state">No best sellers.</div>';
+		container.innerHTML = '<div class="empty-state">No best sellers.</div>';
 		return;
 	}
 
-	const liveIds = new Set();
+	const liveBestSellerIds = new Set(productsMeta.map((p) => p.id));
 	const changedIds = [];
 
 	for (const p of productsMeta) {
-		liveIds.add(p.id);
-
 		if (
 			!localTimestampsParsed[p.id] ||
 			localTimestampsParsed[p.id] !== p.updated_at
-		)
+		) {
 			changedIds.push(p.id);
+		}
 	}
 
-	// 2. Remove deleted products from cache
-	localProducts = localProducts.filter((p) => liveIds.has(p.id));
+	// 2. Remove products that are no longer best sellers
+	localProducts = localProducts.filter((p) => liveBestSellerIds.has(p.id));
 
-	// 3. Fetch changed products
+	// 3. Remove stale timestamps
+	for (const id in localTimestampsParsed) {
+		if (!liveBestSellerIds.has(id)) {
+			delete localTimestampsParsed[id];
+		}
+	}
+
+	// 4. Fetch changed products
 	let updatedProducts = [];
 	if (changedIds.length > 0) {
 		const { data, error } = await supabase
@@ -52,36 +59,33 @@ async function loadBestSellers() {
 			.in("id", changedIds);
 
 		if (error) return console.error(error);
-
 		updatedProducts = data;
 	}
 
-	// 4. Merge
+	// 5. Merge
 	const productMap = new Map(localProducts.map((p) => [p.id, p]));
-	updatedProducts.forEach((p) => {
+
+	for (const p of updatedProducts) {
 		productMap.set(p.id, p);
 		localTimestampsParsed[p.id] = p.updated_at;
-	});
+	}
 
 	const bestSellers = Array.from(productMap.values());
 
-	// 5. Save
+	// 6. Save
 	localStorage.setItem("bestSellers", JSON.stringify(bestSellers));
 	localStorage.setItem(
 		"bestSellersTimestamps",
 		JSON.stringify(localTimestampsParsed),
 	);
 
-	// 6. Render
-	const container = document.getElementById("bestSellers");
-	container.innerHTML = "";
-
+	// 7. Render
 	if (bestSellers.length === 0) {
 		container.innerHTML = '<div class="empty-state">No best sellers.</div>';
 		return;
 	}
 
-	bestSellers.forEach((p) => {
+	for (const p of bestSellers) {
 		const div = document.createElement("div");
 		div.className = "product-card";
 
@@ -101,10 +105,7 @@ async function loadBestSellers() {
 		});
 
 		container.appendChild(div);
-	});
-
-	// Optional: duplicate for scrolling like before
-	bestSellers.forEach((p) => container.appendChild(renderProductCard(p)));
+	}
 }
 
 loadBestSellers();
